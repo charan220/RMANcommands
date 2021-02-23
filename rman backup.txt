@@ -1,0 +1,108 @@
+1)RMAN> BACKUP AS BACKUPSET DATABASE PLUS ARCHIVELOG;
+2)View Current RMAN Configuration
+rman target /
+
+
+3)To view current RMAN configurations, execute “show all”.
+RMAN> SHOW ALL;
+using target database control file instead of recovery catalog
+RMAN configuration parameters are:
+CONFIGURE RETENTION POLICY TO RECOVERY WINDOW OF 2 DAYS;
+CONFIGURE BACKUP OPTIMIZATION ON;
+CONFIGURE DEFAULT DEVICE TYPE TO DISK;
+CONFIGURE CONTROLFILE AUTOBACKUP ON;
+CONFIGURE CONTROLFILE AUTOBACKUP FORMAT FOR DEVICE TYPE DISK TO "/backup/rman/ctl_%F";
+CONFIGURE DEVICE TYPE DISK BACKUP TYPE TO COMPRESSED BACKUPSET PARALLELISM 2;
+CONFIGURE DATAFILE BACKUP COPIES FOR DEVICE TYPE DISK TO 1;
+CONFIGURE ARCHIVELOG BACKUP COPIES FOR DEVICE TYPE DISK TO 1;
+CONFIGURE CHANNEL DEVICE TYPE DISK FORMAT   "/backup/rman/full_%u_%s_%p" MAXPIECESIZE 2048 M;
+CONFIGURE MAXSETSIZE TO UNLIMITED;
+CONFIGURE ENCRYPTION FOR DATABASE OFF;
+CONFIGURE ENCRYPTION ALGORITHM 'AES128';
+CONFIGURE ARCHIVELOG DELETION POLICY TO NONE;
+CONFIGURE SNAPSHOT CONTROLFILE NAME TO '/u01/app/oracle/product/10.2.0/dbs/snapcf_devdb.f'; # default
+
+4)Change Few RMAN Configuration Parameters.
+CONFIGURE CHANNEL DEVICE TYPE DISK FORMAT '/backup/rman/full_%u_%s_%p';
+
+5)Retention Period: Next, you should specify how long you want tto reover:
+RMAN> CONFIGURE RETENTION POLICY TO RECOVERY WINDOW OF 7 DAYS;
+
+6)Verify that the above two changes are done.
+SHOW ALL;
+
+
+
+
+To clear the reention policy 
+RMAN> CONFIGURE RETENTION POLICY CLEAR;
+result: RMAN> SHOW ALL;
+CONFIGURE RETENTION POLICY TO REDUNDANCY 1; # default sets to one day.
+
+
+
+
+ Backup Oracle Database:
+BACKUP AS BACKUPSET DATABASE;
+
+
+to backup all the databse including archiveogs:
+RMAN> BACKUP AS BACKUPSET DATABASE PLUS ARCHIVELOG;
+
+
+1)You can also take a backup of only a specific table space.
+BACKUP AS BACKUPSET TABLESPACE PRD01;
+
+output:
+RMAN> BACKUP AS BACKUPSET DATABASE
+Starting backup at 10-AUG-13
+using target database control file instead of recovery catalog
+allocated channel: ORA_DISK_1
+channel ORA_DISK_1: sid=193 devtype=DISK
+allocated channel: ORA_DISK_2
+channel ORA_DISK_2: sid=192 devtype=DISK
+channel ORA_DISK_1: starting full datafile backupset
+channel ORA_DISK_1: specifying datafile(s) in backupset
+input datafile fno=00025 name=/u03/oradata/devdb/devuser07.dbf
+input datafile fno=00003 name=/u02/oradata/devdb/temp01.dbf
+channel ORA_DISK_1: starting piece 1 at 10-AUG-13
+channel ORA_DISK_2: starting full datafile backupset
+channel ORA_DISK_2: specifying datafile(s) in backupset
+input datafile fno=00008 name=/u03/oradata/devdb/devusers05.dbf
+channel ORA_DISK_2: starting piece 1 at 10-AUG-13
+...
+..
+
+piece handle=/backup/rman/full_4dogpd0u_4237_1 tag=TAG20130808T114846 comment=NONE
+channel ORA_DISK_1: backup set complete, elapsed time: 00:00:03
+Finished backup at 10-AUG-13
+...
+Starting Control File and SPFILE Autobackup at 10-AUG-13
+piece handle=/backup/rman/ctl_c-758818131-20130808-00 comment=NONE
+Finished Control File and SPFILE Autobackup at 10-AUG-13
+
+
+
+list all backup files.
+ls -l /backup/rman/
+
+
+ 3)Change Oracle RMAN Backup File Name Format
+
+RMAN> CONFIGURE CHANNEL DEVICE TYPE DISK FORMAT   "/backup/rman/full_devdb_bk_%u_%s_%p" MAXPIECESIZE 2048 M;
+
+4)RMAN> BACKUP AS COMPRESSED BACKUPSET TAG 'WEEEKLY_PRD01_TBLS_BK_ONLY' TABLESPACE PRD01;
+
+5)View all RMAN Backups
+LIST BACKUP SUMMARY;
+
+
+
+ run
+{
+shutdown immediate
+startup mount
+backup database;
+
+}
+

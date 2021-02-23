@@ -1,0 +1,46 @@
+RMAN> SET DBID 12345;
+
+RMAN> STARTUP NOMOUNT;
+
+RMAN> RESTORE CONTROLFILE FROM "/backup/rman/ctl_c-12345-20141003-03"; 
+
+RMAN> ALTER DATABASE MOUNT;
+
+we can restore using tagname also as below
+RMAN> RESTORE CONTROLFILE FROM TAG 'WEEKLY_FULL_BKUP';
+
+RMAN> RESTORE CONTROLFILE FROM AUTOBACKUP;
+
+
+step2):Restore the Database:
+RMAN> RESTORE DATABASE;
+
+Step 3: Recover Database (and ResetLogs)
+
+RMAN> RECOVER DATABASE;
+
+RMAN> ALTER DATABASE OPEN RESETLOGS;
+
+
+
+TO restore specific tablespace:
+RMAN> RESTORE TABLESPACE dev1;
+or multiple tables as below
+RMAN> RESTORE TABLESPACE dev1, dev2;
+
+
+To restore using data file 
+RMNAN> RESTORE DATAFILE '/u01/oradata/devdb/dev1_01.dbf'
+
+
+PReview:
+RMAN> RESTORE DATABASE PREVIEW;
+
+Summary of recovery:
+RMAN> RESTORE DATABASE PREVIEW SUMMARY;
+
+
+
+Validate the Backup Before Restore :
+RMAN> RESTORE DATABASE VALIDATE;
+
